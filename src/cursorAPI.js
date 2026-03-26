@@ -3,19 +3,21 @@ import CursorStream from "./cursorStream.js";
 
 export default class CursorAPI {
 	#CursorStream;
-	Inspector;
 	#CursorBroadcast;
 	#BroadcastRegistry;
 	#PayloadRegistry;
+	Inspector;
 	constructor() {
 		this.#CursorStream = new CursorStream();
-		this.Inspector = new CursorInspector(this);
-		this.#CursorBroadcast =
-			this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast;
-		this.#BroadcastRegistry =
-			this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast.broadcastRegistry;
-		this.#PayloadRegistry =
-			this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast.payloadRegistry;
+		this.#CursorBroadcast = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast;
+		this.#BroadcastRegistry = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast.broadcastRegistry;
+		this.#PayloadRegistry = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast.payloadRegistry;
+		this.Inspector = new CursorInspector({
+			broadcastRegistry: this.#BroadcastRegistry,
+			payloadRegistry: this.#PayloadRegistry,
+			cursorBroadcast: this.#CursorBroadcast,
+		});
+		
 	}
 	streamStart() {
 		this.#CursorStream.start();
@@ -51,19 +53,6 @@ export default class CursorAPI {
 		this.#BroadcastRegistry.unSubscribeCancel(callback);
 	}
 
-	get statusSubscribers() {
-		return this.#BroadcastRegistry.statusSubscribers;
-	}
-	get intentSubscribers() {
-		return this.#BroadcastRegistry.intentSubscribers;
-	}
-	get commitSubscribers() {
-		return this.#BroadcastRegistry.commitSubscribers;
-	}
-	get cancelSubscribers() {
-		return this.#BroadcastRegistry.cancelSubscribers;
-	}
-
 	registerStatusPayload(providerID, payloadRef) {
 		this.#PayloadRegistry.includeWithStatus(providerID, payloadRef);
 	}
@@ -88,31 +77,5 @@ export default class CursorAPI {
 	}
 	removeCancelPayload(providerID) {
 		this.#PayloadRegistry.removeCancelPayload(providerID);
-	}
-
-	get registeredStatusPayloads() {
-		return this.#PayloadRegistry.statusPayloads;
-	}
-	get registeredIntentPayloads() {
-		return this.#PayloadRegistry.intentPayloads;
-	}
-	get registeredCommitPayloads() {
-		return this.#PayloadRegistry.commitPayloads;
-	}
-	get registeredCancelPayloads() {
-		return this.#PayloadRegistry.cancelPayloads;
-	}
-
-	get statusBroadcastObj() {
-		return this.#CursorBroadcast.statusBroadcast;
-	}
-	get intentBroadcastObj() {
-		return this.#CursorBroadcast.intentBroadcast;
-	}
-	get commitBroadcastObj() {
-		return this.#CursorBroadcast.commitBroadcast;
-	}
-	get cancelBroadcastObj() {
-		return this.#CursorBroadcast.cancelBroadcast;
 	}
 }

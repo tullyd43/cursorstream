@@ -35,6 +35,7 @@ export default class BuildPayload {
 		this.cursorBroadcast.commitBroadcast.target = payload.target;
 		this.cursorBroadcast.broadcastCommit();
 	}
+	// havent decided on cancel strategy yet. this probably aint it. 
 	buildCancelPayload(payload) {
 		// this.#cursorBroadcast.broadcastCancel.x = payload.x;
 		// this.#cursorBroadcast.broadcastCancel.y = payload.y;
