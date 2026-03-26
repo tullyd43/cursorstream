@@ -1,4 +1,4 @@
-import BroadcastRegistry from "../cursorstream/broadcastRegistry.js";
+import BroadcastRegistry from "./broadcastRegistry.js";
 import PayloadRegistry from "./payloadRegistry.js";
 
 export default class CursorBroadcast {
