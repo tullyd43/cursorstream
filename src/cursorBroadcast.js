@@ -47,25 +47,25 @@ export default class CursorBroadcast {
 	// Broadcast to subscribers
 	broadcastStatus() {
 		this.broadcastRegistry.statusSubscribers.forEach((subscriber) => {
-			subscriber();
+			subscriber(this.statusBroadcast);
 			return;
 		});
 	}
 	broadcastIntent() {
 		this.broadcastRegistry.intentSubscribers.forEach((subscriber) => {
-			subscriber();
+			subscriber(this.statusBroadcast);
 			return;
 		});
 	}
 	broadcastCommit() {
 		this.broadcastRegistry.commitSubscribers.forEach((subscriber) => {
-			subscriber();
+			subscriber(this.statusBroadcast);
 			return;
 		});
 	}
 	broadcastCancel() {
 		this.broadcastRegistry.cancelSubscribers.forEach((subscriber) => {
-			subscriber();
+			subscriber(this.statusBroadcast);
 			return;
 		});
 	}

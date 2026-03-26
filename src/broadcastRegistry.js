@@ -7,7 +7,7 @@ export default class BroadcastRegistry {
 		this.commitSubscribers = new Set();
 		this.cancelSubscribers = new Set();
 	}
-	// Register callbacks
+	// Register callbacks that take in the broadcast channel object
 	subscribeStatus(subscriber) {
 		this.statusSubscribers.add(subscriber);
 		return;
