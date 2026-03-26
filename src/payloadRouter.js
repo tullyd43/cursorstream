@@ -1,0 +1,45 @@
+import BuildPayload from "./buildPayload.js";
+
+export default class PayloadRouter {
+	buildPayload;
+	static #BUFFER_MIRROR = {
+		x: 0,
+		y: 0,
+		buttons: 0,
+		phase: null,
+		status: null,
+		target: null,
+	};
+	constructor() {
+		this.payloadBuffer = {};
+		this.buildPayload = new BuildPayload();
+	}
+	route() {
+		switch (this.payloadBuffer.phase) {
+			case "intent":
+				this.buildPayload.buildIntentPayload(this.payloadBuffer);
+				console.log("intent buffer", this.payloadBuffer);
+				break;
+			case "commit":
+				this.buildPayload.buildCommitPayload(this.payloadBuffer);
+				console.log("commit buffer", this.payloadBuffer);
+				break;
+			case "cancel":
+				this.buildPayload.buildCancelPayload(this.payloadBuffer);
+				console.log("cancel buffer", this.payloadBuffer);
+				break;
+		}
+		this.buildPayload.buildStatusPayload(this.payloadBuffer);
+		console.log("buffer", this.payloadBuffer);
+		this.resetPayloadBuffer();
+		return;
+	}
+	resetPayloadBuffer() {
+		this.payloadBuffer.x = PayloadRouter.#BUFFER_MIRROR.x;
+		this.payloadBuffer.y = PayloadRouter.#BUFFER_MIRROR.y;
+		this.payloadBuffer.buttons = PayloadRouter.#BUFFER_MIRROR.buttons;
+		this.payloadBuffer.phase = PayloadRouter.#BUFFER_MIRROR.phase;
+		this.payloadBuffer.status = PayloadRouter.#BUFFER_MIRROR.status;
+		this.payloadBuffer.target = PayloadRouter.#BUFFER_MIRROR.target;
+	}
+}
