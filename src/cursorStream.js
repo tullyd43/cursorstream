@@ -14,7 +14,7 @@ import PayloadRouter from "./payloadRouter.js";
 
 export default class CursorStream {
 	payloadRouter;
-	constructor() {
+	constructor(settings) {
 		this.x;
 		this.y;
 		this.buttons;

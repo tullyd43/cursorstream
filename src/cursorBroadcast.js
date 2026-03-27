@@ -43,9 +43,14 @@ export default class CursorBroadcast {
 			target: null,
 			payloads: {},
 		};
+		this.statusThrottle; 
+		this.customStatusThrottleRate;
+		this.phaseThrottle;
+		this.customPhaseThrottleRate;
 	}
 	// Broadcast to subscribers
 	broadcastStatus() {
+
 		this.broadcastRegistry.statusSubscribers.forEach((subscriber) => {
 			subscriber(this.statusBroadcast);
 			return;
@@ -99,4 +104,23 @@ export default class CursorBroadcast {
 	stopCancelBroadcast() {
 		this.cancelBroadcast = null;
 	}
+
+
+	// Rate limit control
+	rAFThrottleStatus() {
+
+	}
+	customThrottleStatus() {
+
+	}
+	bypassThrottleStatus() {
+		this.broadcastRegistry.statusSubscribers.forEach((subscriber) => {
+			subscriber(this.statusBroadcast);
+			return;
+	});
+	}
+	rAFThrottlePhases() { }
+	customThrottlePhases() { }
+	bypassThrottlePhases() {}
+	
 }

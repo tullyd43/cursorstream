@@ -1,3 +1,4 @@
+import CursorConfigs from "./cursorConfigs.js";
 import CursorInspector from "./cursorInspector.js";
 import CursorStream from "./cursorStream.js";
 
@@ -7,17 +8,18 @@ export default class CursorAPI {
 	#BroadcastRegistry;
 	#PayloadRegistry;
 	Inspector;
-	constructor() {
-		this.#CursorStream = new CursorStream();
+	CursorConfigs;
+	constructor(configs) {
+		this.#CursorStream = new CursorStream(this.CursorConfigs);
 		this.#CursorBroadcast = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast;
 		this.#BroadcastRegistry = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast.broadcastRegistry;
 		this.#PayloadRegistry = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast.payloadRegistry;
+		this.CursorConfigs = new CursorConfigs(this.#CursorBroadcast, configs)
 		this.Inspector = new CursorInspector({
 			broadcastRegistry: this.#BroadcastRegistry,
 			payloadRegistry: this.#PayloadRegistry,
 			cursorBroadcast: this.#CursorBroadcast,
 		});
-		
 	}
 	streamStart() {
 		this.#CursorStream.start();
