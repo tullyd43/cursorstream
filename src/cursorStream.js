@@ -13,6 +13,7 @@ import {
 import PayloadRouter from "./payloadRouter.js";
 
 export default class CursorStream {
+	static lastEventTime;
 	payloadRouter;
 	constructor(settings) {
 		this.x;
@@ -78,6 +79,7 @@ export default class CursorStream {
 		return;
 	}
 	setStreamActivity(e) {
+		this.setStreamTime(e)
 		this.setStreamPosition(e);
 		this.setStreamTarget(e);
 		this.streamStatus();
@@ -90,6 +92,10 @@ export default class CursorStream {
 	}
 	setStreamTarget(e) {
 		this.target = e.target;
+		return;
+	}
+	setStreamTime(e) {
+		CursorStream.lastEventTime = e.timeStamp;
 		return;
 	}
 	streamButtons(e) {

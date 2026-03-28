@@ -19,14 +19,14 @@ export default class CursorConfigs {
 
     setStatusThrottle() {
         if (this.throttleStatus === "auto") {
-            this.#CursorBroadcast.statusThrottle = this.#CursorBroadcast.rAFThrottleStatus;
+            this.#CursorBroadcast.statusThrottle = this.#CursorBroadcast.rAFThrottleStatus(this.#CursorBroadcast.broadcastStatusCallback);
             return 
         } else if (this.throttleStatus === 0) {
             this.#CursorBroadcast.statusThrottle = this.#CursorBroadcast.bypassThrottleStatus;
             return 
         } else if (this.throttleStatus >= 1) {
-            this.#CursorBroadcast.statusThrottle = this.#CursorBroadcast.customThrottleStatus;
-            this.#CursorBroadcast.customThrottleStatusRate = this.throttleStatus;
+            this.#CursorBroadcast.statusThrottle = this.#CursorBroadcast.customThrottleStatusRate(this.throttleStatus);
+            this.#CursorBroadcast.customThrottleStatusRate = 1000 / this.throttleStatus;
             return 
         } else {
             return // handle an error
@@ -47,7 +47,7 @@ export default class CursorConfigs {
     }
 
     applyConfigs() {
-        this.setStatusThrottle()
-        this.setPhasesThrottle()
+        this.setStatusThrottle();
+        this.setPhasesThrottle();
     }
 }

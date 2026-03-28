@@ -1,9 +1,14 @@
 import BroadcastRegistry from "./broadcastRegistry.js";
+import CursorStream from "./cursorStream.js";
 import PayloadRegistry from "./payloadRegistry.js";
 
 export default class CursorBroadcast {
 	broadcastRegistry;
 	payloadRegistry;
+	static lastStatusRenderTime = performance.now();
+	static lastPhaseRenderTime = performance.now();
+	static statusDeltaTime = performance.now();
+	static phaseDeltaTime = performance.now();
 	constructor() {
 		this.broadcastRegistry = new BroadcastRegistry();
 		this.payloadRegistry = new PayloadRegistry(this);
@@ -43,19 +48,25 @@ export default class CursorBroadcast {
 			target: null,
 			payloads: {},
 		};
-		this.statusThrottle; 
+		this.statusThrottle;
 		this.customStatusThrottleRate;
 		this.phaseThrottle;
 		this.customPhaseThrottleRate;
 	}
 	// Broadcast to subscribers
 	broadcastStatus() {
-
+		this.statusThrottle();
+	}
+	broadcastStatusCallback = (timestamp) => {
+		this.lastStatusRenderTime = timestamp;
+		this.statusDeltaTime = 0;
 		this.broadcastRegistry.statusSubscribers.forEach((subscriber) => {
 			subscriber(this.statusBroadcast);
 			return;
 		});
-	}
+	};
+	broadcastPhasesCallback = (timestamp) => {};
+
 	broadcastIntent() {
 		this.broadcastRegistry.intentSubscribers.forEach((subscriber) => {
 			subscriber(this.statusBroadcast);
@@ -105,22 +116,28 @@ export default class CursorBroadcast {
 		this.cancelBroadcast = null;
 	}
 
-
 	// Rate limit control
-	rAFThrottleStatus() {
-
+	rAFThrottleStatus(callback) {
+		this.getStatusDeltaTime();
+		return window.requestAnimationFrame(callback);
 	}
-	customThrottleStatus() {
 
+	customThrottleStatus() {
+		this.getStatusDeltaTime();
+		if (this.statusDeltaTime >= this.customStatusThrottleRate) {
+			this.broadcastStatusCallback(performance.now());
+		}
+		//not done
 	}
 	bypassThrottleStatus() {
-		this.broadcastRegistry.statusSubscribers.forEach((subscriber) => {
-			subscriber(this.statusBroadcast);
-			return;
-	});
+		this.broadcastStatusCallback(performance.now());
 	}
-	rAFThrottlePhases() { }
-	customThrottlePhases() { }
+	getStatusDeltaTime() {
+		this.statusDeltaTime = performance.now() - this.lastStatusRenderTime;
+		return;
+	}
+
+	rAFThrottlePhases() {}
+	customThrottlePhases() {}
 	bypassThrottlePhases() {}
-	
 }
