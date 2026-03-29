@@ -14,6 +14,8 @@ import PayloadRouter from "./payloadRouter.js";
 
 export default class CursorStream {
 	static lastEventTime;
+	static idleTimer;
+	idleDelay;
 	payloadRouter;
 	constructor() {
 		this.x;
@@ -29,6 +31,7 @@ export default class CursorStream {
 		downListener(this);
 		upListener(this);
 		cancelListener(this);
+		this.idleTimer = this.startidleTimer();
 		return;
 	}
 	stop() {
@@ -68,13 +71,9 @@ export default class CursorStream {
 		return;
 	}
 	streamStatus() {
-		setStreamActive(this);
-		if (!idleTimer.timer) {
-			idleTimer.startTimer(this);
-		} else {
-			idleTimer.stopTimer();
-			idleTimer.startTimer(this);
-		}
+		this.status= "active"
+		this.stopTimer();
+		this.startTimer();
 		this.forwardPayload();
 		return;
 	}
@@ -115,25 +114,20 @@ export default class CursorStream {
 		console.log("live mutable", this);
 		this.payloadRouter.route();
 	}
+	setStreamActive() {
+		this.status = "active"
+	}
+	setStreamIdle = () => {
+		this.status = "idle";
+	}
+	startIdleTimer() {
+		setTimeout(() => {
+			this.setStreamIdle();
+			this.forwardPayload();
+		}, this.idleDelay);
+	}
+	stopIdleTimer() {
+		clearTimeout(this.idleTimer)
+		this.idleTimer = null;
+	}
 }
-
-// CursorStream class helpers
-function setStreamIdle(stream) {
-	stream.status = "idle";
-}
-function setStreamActive(stream) {
-	stream.status = "active";
-}
-const idleTimer = {
-	timer: null,
-	startTimer(stream) {
-		this.timer = setTimeout(() => {
-			setStreamIdle(stream);
-			stream.forwardPayload();
-		}, 5000);
-	},
-	stopTimer() {
-		clearTimeout(this.timer);
-		this.timer = null;
-	},
-};

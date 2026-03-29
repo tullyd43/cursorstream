@@ -23,6 +23,7 @@ export default class CursorAPI {
 	}
 	streamStart() {
 		this.#CursorStream.start();
+		this.CursorConfigs.applyConfigs()
 	}
 	streamStop() {
 		this.#CursorStream.stop();

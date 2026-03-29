@@ -9,7 +9,15 @@ export default class CursorBroadcast {
 	static lastPhaseRenderTime = performance.now();
 	static statusDeltaTime = performance.now();
 	static phaseDeltaTime = performance.now();
+	static phaseCallback; // Callback refs to be used in phase throttling methods. Active callback is stored in activePhaseCallback
+	static activePhaseCallback; // Active callback to be used in throttling methods. Phases are dynamic. Callback refs are held in phaseCallback {}
+	static activeStatusCallback; // Callback to be used in throttling methods. Status is static
+	static statusThrottle; // Configured throttle strategy method
+	static customStatusThrottleRate; // Calculated custom frame time from config object
+	static phaseThrottle; // Configured throttle strategy method
+	static customPhaseThrottleRate; // Calculated custom frame time from config object
 	constructor() {
+		this.activeStatusCallback = this.broadcastStatusCallback;
 		this.broadcastRegistry = new BroadcastRegistry();
 		this.payloadRegistry = new PayloadRegistry(this);
 		this.statusBroadcast = {
@@ -48,17 +56,12 @@ export default class CursorBroadcast {
 			target: null,
 			payloads: {},
 		};
-		phaseCallback = {
+		this.phaseCallback = {
 			intent: this.intentPhaseCallback,
 			commit: this.commitPhaseCallback,
 			cancel: this.cancelPhaseCallback,
-		}; // Callback refs to be used in phase throttling methods. Active callback is stored in activePhaseCallback
-		this.activePhaseCallback = null; // Active callback to be used in throttling methods. Phases are dynamic. Callback refs are held in phaseCallback {}
-		this.activeStatusCallback = this.broadcastStatusCallback; // Callback to be used in throttling methods. Status is static
-		this.statusThrottle; // Configured throttle strategy method
-		this.customStatusThrottleRate; // Calculated custom frame time from config object
-		this.phaseThrottle; // Configured throttle strategy method
-		this.customPhaseThrottleRate; // Calculated custom frame time from config object
+		}; 
+		this.activePhaseCallback = null;
 	}
 	// Broadcast to subscribers
 	broadcastStatus() {

@@ -1,4 +1,4 @@
-
+import CursorStream from "./cursorStream.js";
 
 export default class CursorInspector {
 	#broadcastRegistry;
@@ -56,5 +56,24 @@ export default class CursorInspector {
 	}
 	get allBroadcastObj() {
 		return { ...this.#cursorBroadcast };
+	}
+
+	get lastEventTime() {
+		return this.lastEventTime;
+	}
+	get idleTimer() {
+		return this.idleTimer;
+	}
+	get lastStatusRenderTime() {
+		return this.lastStatusRenderTime;
+	}
+	get lastPhaseRenderTime() {
+		return this.lastPhaseRenderTime;
+	}
+	get statusDeltaTime() {
+		return this.statusDeltaTime;
+	}
+	get phaseDeltaTime() {
+		return this.phaseDeltaTime;
 	}
 }

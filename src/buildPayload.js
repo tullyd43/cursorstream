@@ -34,7 +34,7 @@ export default class BuildPayload {
 		this.cursorBroadcast.commitBroadcast.phase = payload.phase;
 		this.cursorBroadcast.commitBroadcast.status = payload.status;
 		this.cursorBroadcast.commitBroadcast.target = payload.target;
-		this.cursorBroadcast.activeStatusCallbacke = this.cursorBroadcast.phaseCallback.commit;
+		this.cursorBroadcast.activeStatusCallback = this.cursorBroadcast.phaseCallback.commit;
 		this.cursorBroadcast.broadcastCommit();
 	}
 	// havent decided on cancel strategy yet. this probably aint it. 

@@ -1,20 +1,22 @@
 
 
 export default class CursorConfigs {
+    #CursorStream
     #CursorBroadcast
     constructor(
         CursorBroadcast,
+        CursorStream,
         configs = {
             throttleStatus: "auto",
             throttlePhases: "auto",
-            idleTimer: 5000,
+            idleDelay: 5000,
         }
     ) {
+        this.#CursorStream = CursorStream;
         this.#CursorBroadcast = CursorBroadcast;
         this.throttleStatus = configs.throttleStatus;
         this.throttlePhases = configs.throttlePhases;
-        this.idleTimer = configs.idleTimer;
-        this.applyConfigs() // maybe needs to go in instance init state method
+        this.idleDelay = configs.idleDelay;
     }
 
     setStatusThrottle() {
@@ -45,6 +47,9 @@ export default class CursorConfigs {
         } else {
             return // handle an error
         }
+    }
+    setIdleTimeout() {
+        this.#CursorStream.idleDelay = this.idleDelay;
     }
 
     applyConfigs() {
