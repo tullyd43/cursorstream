@@ -1,22 +1,11 @@
-import {
-	moveListener,
-	downListener,
-	upListener,
-	cancelListener,
-	onMove,
-	onDown,
-	onUp,
-	onCancel,
-	buttonDownTracker,
-	buttonUpTracker,
-} from "./pointerAdapter.js";
 import PayloadRouter from "./payloadRouter.js";
 
 export default class CursorStream {
 	static lastEventTime;
 	static idleTimer;
 	idleDelay;
-	payloadRouter;
+	StreamSources;
+	payloadRouter = new PayloadRouter();
 	constructor() {
 		this.x;
 		this.y;
@@ -24,85 +13,62 @@ export default class CursorStream {
 		this.phase;
 		this.status;
 		this.target;
-		this.payloadRouter = new PayloadRouter();
 	}
 	start() {
-		moveListener(this);
-		downListener(this);
-		upListener(this);
-		cancelListener(this);
-		this.idleTimer = this.startidleTimer();
+		this.StreamSources.moveListener();
+		this.StreamSources.downListener();
+		this.StreamSources.upListener();
+		this.StreamSources.cancelListener();
+		this.idleTimer = this.startIdleTimer();
 		return;
 	}
 	stop() {
-		window.removeEventListener("pointermove", onMove);
-		window.removeEventListener("pointerdown", onDown);
-		window.removeEventListener("pointerup", onUp);
-		window.removeEventListener("pointercancel", onCancel);
-		window.removeEventListener("pointerdown", buttonDownTracker);
-		window.removeEventListener("pointerup", buttonUpTracker);
+		window.removeEventListener("pointermove", this.StreamSources.onMove);
+		window.removeEventListener("pointerdown", this.StreamSources.onDown);
+		window.removeEventListener("pointerup", this.StreamSources.onUp);
+		window.removeEventListener("pointercancel", this.StreamSources.onCancel);
 		return;
 	}
 	streamPhase(e) {
 		switch (e.type) {
 			case "pointerdown":
 				this.phase = "intent";
+				this.buttons = e.buttons;
 				this.forwardPayload();
 				break;
 			case "pointerup":
 				this.phase = "commit";
+				this.buttons = e.buttons;
 				this.forwardPayload();
-				this.resetPhase();
-				this.resetButtons();
+				this.phase = null;
+				this.buttons = 0;
 				break;
 			// Cancel might need another path for a dedicated cancel button
 			case "pointercancel":
 				this.phase = "cancel";
-				this.streamButtons(e);
+				this.buttons = e.buttons
 				this.forwardPayload();
-				this.resetPhase();
-				this.resetButtons();
+				this.phase = null;
+				this.buttons = 0;
 				break;
 		}
 		return;
 	}
-	resetPhase() {
-		this.phase = null;
-		return;
-	}
 	streamStatus() {
-		this.status= "active"
+		this.status = "active";
 		this.stopTimer();
 		this.startTimer();
 		this.forwardPayload();
 		return;
 	}
 	setStreamActivity(e) {
-		this.setStreamTime(e)
-		this.setStreamPosition(e);
-		this.setStreamTarget(e);
-		this.streamStatus();
-		return;
-	}
-	setStreamPosition(e) {
+		this.lastEventTime = e.timeStamp;
 		this.x = e.clientX;
 		this.y = e.clientY;
-		return;
-	}
-	setStreamTarget(e) {
 		this.target = e.target;
+		this.lastEventTime = e.timeStamp;
+		this.streamStatus();
 		return;
-	}
-	setStreamTime(e) {
-		CursorStream.lastEventTime = e.timeStamp;
-		return;
-	}
-	streamButtons(e) {
-		this.buttons = e.buttons;
-		return;
-	}
-	resetButtons() {
-		this.buttons = 0;
 	}
 	forwardPayload() {
 		this.payloadRouter.payloadBuffer.x = this.x;
@@ -115,11 +81,11 @@ export default class CursorStream {
 		this.payloadRouter.route();
 	}
 	setStreamActive() {
-		this.status = "active"
+		this.status = "active";
 	}
 	setStreamIdle = () => {
 		this.status = "idle";
-	}
+	};
 	startIdleTimer() {
 		setTimeout(() => {
 			this.setStreamIdle();
@@ -127,7 +93,7 @@ export default class CursorStream {
 		}, this.idleDelay);
 	}
 	stopIdleTimer() {
-		clearTimeout(this.idleTimer)
+		clearTimeout(this.idleTimer);
 		this.idleTimer = null;
 	}
 }

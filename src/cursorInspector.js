@@ -76,4 +76,14 @@ export default class CursorInspector {
 	get phaseDeltaTime() {
 		return this.phaseDeltaTime;
 	}
+
+
+	// possible new inspector objects to expose
+	phaseCallback; // Callback refs to be used in phase throttling methods. Active callback is stored in activePhaseCallback
+	activePhaseCallback; // Active callback to be used in throttling methods. Phases are dynamic. Callback refs are held in phaseCallback {}
+	activeStatusCallback; // Callback to be used in throttling methods. Status is static
+	statusThrottle; // Configured throttle strategy method
+	customStatusThrottleRate; // Calculated custom frame time from config object
+	phaseThrottle; // Configured throttle strategy method
+	customPhaseThrottleRate; // Calculated custom frame time from config object
 }

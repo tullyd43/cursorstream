@@ -48,12 +48,13 @@ export default class CursorConfigs {
             return // handle an error
         }
     }
-    setIdleTimeout() {
+    setIdleDelay() {
         this.#CursorStream.idleDelay = this.idleDelay;
     }
 
     applyConfigs() {
         this.setStatusThrottle();
         this.setPhasesThrottle();
+        this.setIdleDelay();
     }
 }

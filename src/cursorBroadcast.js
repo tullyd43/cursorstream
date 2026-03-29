@@ -17,7 +17,6 @@ export default class CursorBroadcast {
 	static phaseThrottle; // Configured throttle strategy method
 	static customPhaseThrottleRate; // Calculated custom frame time from config object
 	constructor() {
-		this.activeStatusCallback = this.broadcastStatusCallback;
 		this.broadcastRegistry = new BroadcastRegistry();
 		this.payloadRegistry = new PayloadRegistry(this);
 		this.statusBroadcast = {
@@ -56,6 +55,7 @@ export default class CursorBroadcast {
 			target: null,
 			payloads: {},
 		};
+		this.activeStatusCallback = this.broadcastStatusCallback;
 		this.phaseCallback = {
 			intent: this.intentPhaseCallback,
 			commit: this.commitPhaseCallback,
