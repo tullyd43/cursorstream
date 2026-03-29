@@ -1,7 +1,5 @@
-import CursorStream from "./cursorStream";
-
 export default class StreamSources {
-    constructor() {
+    constructor(CursorStream) {
         this.onMove = (e) => CursorStream.setStreamActivity(e);
 		this.onDown = (e) => CursorStream.streamPhase(e);
 		this.onUp = (e) => CursorStream.streamPhase(e);

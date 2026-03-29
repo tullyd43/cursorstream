@@ -24,7 +24,7 @@ export default class BuildPayload {
 		this.cursorBroadcast.intentBroadcast.phase = payload.phase;
 		this.cursorBroadcast.intentBroadcast.status = payload.status;
 		this.cursorBroadcast.intentBroadcast.target = payload.target;
-		this.cursorBroadcast.activeStatusCallback = this.cursorBroadcast.phaseCallback.intent;
+		this.cursorBroadcast.activePhaseCallback = this.cursorBroadcast.phaseCallback.intent;
 		this.cursorBroadcast.broadcastIntent();
 	}
 	buildCommitPayload(payload) {
@@ -34,7 +34,7 @@ export default class BuildPayload {
 		this.cursorBroadcast.commitBroadcast.phase = payload.phase;
 		this.cursorBroadcast.commitBroadcast.status = payload.status;
 		this.cursorBroadcast.commitBroadcast.target = payload.target;
-		this.cursorBroadcast.activeStatusCallback = this.cursorBroadcast.phaseCallback.commit;
+		this.cursorBroadcast.activePhaseCallback = this.cursorBroadcast.phaseCallback.commit;
 		this.cursorBroadcast.broadcastCommit();
 	}
 	// havent decided on cancel strategy yet. this probably aint it. 

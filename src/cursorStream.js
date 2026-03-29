@@ -1,10 +1,11 @@
 import PayloadRouter from "./payloadRouter.js";
+import StreamSources from "./streamSources.js";
 
 export default class CursorStream {
 	static lastEventTime;
 	static idleTimer;
 	idleDelay;
-	StreamSources;
+	StreamSources = new StreamSources(this);
 	payloadRouter = new PayloadRouter();
 	constructor() {
 		this.x;
@@ -19,7 +20,7 @@ export default class CursorStream {
 		this.StreamSources.downListener();
 		this.StreamSources.upListener();
 		this.StreamSources.cancelListener();
-		this.idleTimer = this.startIdleTimer();
+		this.idleTimer = null;
 		return;
 	}
 	stop() {
@@ -56,8 +57,8 @@ export default class CursorStream {
 	}
 	streamStatus() {
 		this.status = "active";
-		this.stopTimer();
-		this.startTimer();
+		this.stopIdleTimer();
+		this.startIdleTimer();
 		this.forwardPayload();
 		return;
 	}
@@ -87,7 +88,7 @@ export default class CursorStream {
 		this.status = "idle";
 	};
 	startIdleTimer() {
-		setTimeout(() => {
+		this.idleTimer = setTimeout(() => {
 			this.setStreamIdle();
 			this.forwardPayload();
 		}, this.idleDelay);

@@ -11,11 +11,11 @@ export default class CursorAPI {
 	Inspector;
 	#CursorConfigs;
 	constructor(configs) {
-		this.#CursorStream = new CursorStream(this.CursorConfigs);
+		this.#CursorStream = new CursorStream();
 		this.#CursorBroadcast = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast;
 		this.#BroadcastRegistry = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast.broadcastRegistry;
 		this.#PayloadRegistry = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast.payloadRegistry;
-		this.#CursorConfigs = new CursorConfigs(this.#CursorBroadcast, configs)
+		this.#CursorConfigs = new CursorConfigs(this.#CursorStream, this.#CursorBroadcast, configs);
 		this.Inspector = new CursorInspector({
 			broadcastRegistry: this.#BroadcastRegistry,
 			payloadRegistry: this.#PayloadRegistry,
@@ -23,8 +23,8 @@ export default class CursorAPI {
 		});
 	}
 	streamStart() {
+		this.#CursorConfigs.applyConfigs()
 		this.#CursorStream.start();
-		this.CursorConfigs.applyConfigs()
 	}
 	streamStop() {
 		this.#CursorStream.stop();

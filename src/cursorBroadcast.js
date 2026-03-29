@@ -65,6 +65,7 @@ export default class CursorBroadcast {
 	}
 	// Broadcast to subscribers
 	broadcastStatus() {
+		console.log(this.statusThrottle)
 		this.statusThrottle();
 	}
 	broadcastStatusCallback = (timestamp) => {
@@ -77,6 +78,7 @@ export default class CursorBroadcast {
 	};
 
 	broadcastIntent() {
+		console.log(this.phaseThrottle);
 		this.phaseThrottle();
 	}
 	intentPhaseCallback = (timestamp) => {
@@ -88,6 +90,7 @@ export default class CursorBroadcast {
 	};
 
 	broadcastCommit() {
+		console.log(this.phaseThrottle);
 		this.phaseThrottle();
 	}
 	commitPhaseCallback = (timestamp) => {
