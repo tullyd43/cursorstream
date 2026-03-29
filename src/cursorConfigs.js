@@ -14,19 +14,19 @@ export default class CursorConfigs {
         this.throttleStatus = configs.throttleStatus;
         this.throttlePhases = configs.throttlePhases;
         this.idleTimer = configs.idleTimer;
-        this.applyConfigs()
+        this.applyConfigs() // maybe needs to go in instance init state method
     }
 
     setStatusThrottle() {
         if (this.throttleStatus === "auto") {
-            this.#CursorBroadcast.statusThrottle = this.#CursorBroadcast.rAFThrottleStatus(this.#CursorBroadcast.broadcastStatusCallback);
+            this.#CursorBroadcast.statusThrottle = this.#CursorBroadcast.rAFThrottleStatus;
             return 
         } else if (this.throttleStatus === 0) {
             this.#CursorBroadcast.statusThrottle = this.#CursorBroadcast.bypassThrottleStatus;
             return 
         } else if (this.throttleStatus >= 1) {
-            this.#CursorBroadcast.statusThrottle = this.#CursorBroadcast.customThrottleStatusRate(this.throttleStatus);
-            this.#CursorBroadcast.customThrottleStatusRate = 1000 / this.throttleStatus;
+            this.#CursorBroadcast.statusThrottle = this.#CursorBroadcast.customThrottleStatus;
+            this.#CursorBroadcast.customStatusThrottleRate = 1000 / this.throttleStatus;
             return 
         } else {
             return // handle an error
@@ -41,6 +41,7 @@ export default class CursorConfigs {
             return;
         } else if (this.throttlePhases >= 1) {
             this.#CursorBroadcast.phasesThrottle = this.#CursorBroadcast.customThrottlePhases;
+            this.#CursorBroadcast.customPhaseThrottleRate = 1000 / this.throttlePhases;
         } else {
             return // handle an error
         }

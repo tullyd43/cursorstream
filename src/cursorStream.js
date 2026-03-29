@@ -15,7 +15,7 @@ import PayloadRouter from "./payloadRouter.js";
 export default class CursorStream {
 	static lastEventTime;
 	payloadRouter;
-	constructor(settings) {
+	constructor() {
 		this.x;
 		this.y;
 		this.buttons;

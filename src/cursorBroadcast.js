@@ -48,10 +48,17 @@ export default class CursorBroadcast {
 			target: null,
 			payloads: {},
 		};
-		this.statusThrottle;
-		this.customStatusThrottleRate;
-		this.phaseThrottle;
-		this.customPhaseThrottleRate;
+		phaseCallback = {
+			intent: this.intentPhaseCallback,
+			commit: this.commitPhaseCallback,
+			cancel: this.cancelPhaseCallback,
+		}; // Callback refs to be used in phase throttling methods. Active callback is stored in activePhaseCallback
+		this.activePhaseCallback = null; // Active callback to be used in throttling methods. Phases are dynamic. Callback refs are held in phaseCallback {}
+		this.activeStatusCallback = this.broadcastStatusCallback; // Callback to be used in throttling methods. Status is static
+		this.statusThrottle; // Configured throttle strategy method
+		this.customStatusThrottleRate; // Calculated custom frame time from config object
+		this.phaseThrottle; // Configured throttle strategy method
+		this.customPhaseThrottleRate; // Calculated custom frame time from config object
 	}
 	// Broadcast to subscribers
 	broadcastStatus() {
@@ -65,26 +72,40 @@ export default class CursorBroadcast {
 			return;
 		});
 	};
-	broadcastPhasesCallback = (timestamp) => {};
 
 	broadcastIntent() {
+		this.phaseThrottle();
+	}
+	intentPhaseCallback = (timestamp) => {
+		this.lastPhaseRenderTime = timestamp;
+		this.phaseDeltaTime = 0;
 		this.broadcastRegistry.intentSubscribers.forEach((subscriber) => {
-			subscriber(this.statusBroadcast);
-			return;
+			subscriber(this.intentBroadcast);
 		});
-	}
+	};
+
 	broadcastCommit() {
+		this.phaseThrottle();
+	}
+	commitPhaseCallback = (timestamp) => {
+		this.lastPhaseRenderTime = timestamp;
+		this.phaseDeltaTime = 0;
 		this.broadcastRegistry.commitSubscribers.forEach((subscriber) => {
-			subscriber(this.statusBroadcast);
-			return;
+			subscriber(this.commitBroadcast);
 		});
-	}
+	};
+
 	broadcastCancel() {
-		this.broadcastRegistry.cancelSubscribers.forEach((subscriber) => {
-			subscriber(this.statusBroadcast);
-			return;
-		});
+		this.phaseThrottle();
 	}
+	cancelPhaseCallback = (timestamp) => {
+		this.lastPhaseRenderTime = timestamp;
+		this.phaseDeltaTime = 0;
+		this.broadcastRegistry.cancelSubscribers.forEach((subscriber) => {
+			subscriber(this.cancelBroadcast);
+		});
+	};
+
 	// Add payload references to broadcast channels
 	linkStatusBroadcast(providerID, payloadReference) {
 		this.statusBroadcast.payloads[providerID] = payloadReference;
@@ -102,6 +123,7 @@ export default class CursorBroadcast {
 		this.cancelBroadcast.payloads[providerID] = payloadReference;
 		return;
 	}
+
 	// Stop broadcast channels
 	stopBroadcast() {
 		this.statusBroadcast = null;
@@ -117,27 +139,39 @@ export default class CursorBroadcast {
 	}
 
 	// Rate limit control
-	rAFThrottleStatus(callback) {
+	rAFThrottleStatus() {
 		this.getStatusDeltaTime();
-		return window.requestAnimationFrame(callback);
+		return window.requestAnimationFrame(this.activeStatusCallback);
 	}
-
 	customThrottleStatus() {
 		this.getStatusDeltaTime();
 		if (this.statusDeltaTime >= this.customStatusThrottleRate) {
-			this.broadcastStatusCallback(performance.now());
+			return this.broadcastStatusCallback(performance.now());
 		}
-		//not done
 	}
 	bypassThrottleStatus() {
-		this.broadcastStatusCallback(performance.now());
+		return this.broadcastStatusCallback(performance.now());
 	}
 	getStatusDeltaTime() {
 		this.statusDeltaTime = performance.now() - this.lastStatusRenderTime;
 		return;
 	}
 
-	rAFThrottlePhases() {}
-	customThrottlePhases() {}
-	bypassThrottlePhases() {}
+	rAFThrottlePhases() {
+		this.getPhaseDeltaTime();
+		return window.requestAnimationFrame(this.activePhaseCallback);
+	}
+	customThrottlePhases() {
+		this.getPhaseDeltaTime();
+		if (this.phaseDeltaTime >= this.customPhaseThrottleRate) {
+			return this.activePhaseCallback(performance.now());
+		}
+	}
+	bypassThrottlePhases() {
+		this.activePhaseCallback(performance.now());
+	}
+	getPhaseDeltaTime() {
+		this.phaseDeltaTime = performance.now() - this.lastPhaseRenderTime;
+		return;
+	}
 }
