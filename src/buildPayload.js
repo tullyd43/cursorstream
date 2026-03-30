@@ -15,7 +15,6 @@ export default class BuildPayload {
 		this.cursorBroadcast.statusBroadcast.status = payload.status;
 		this.cursorBroadcast.statusBroadcast.target = payload.target;
 		this.cursorBroadcast.broadcastStatus();
-		//buffer registered payloads
 	}
 	buildIntentPayload(payload) {
 		this.cursorBroadcast.intentBroadcast.x = payload.x;
@@ -24,7 +23,8 @@ export default class BuildPayload {
 		this.cursorBroadcast.intentBroadcast.phase = payload.phase;
 		this.cursorBroadcast.intentBroadcast.status = payload.status;
 		this.cursorBroadcast.intentBroadcast.target = payload.target;
-		this.cursorBroadcast.activePhaseCallback = this.cursorBroadcast.phaseCallback.intent;
+		this.cursorBroadcast.activePhaseThrottleRef = this.cursorBroadcast.phaseThrottleRefs.intent;
+		this.cursorBroadcast.activePhaseCallback = this.cursorBroadcast.phaseCallbacks.intent;
 		this.cursorBroadcast.broadcastIntent();
 	}
 	buildCommitPayload(payload) {
@@ -34,17 +34,20 @@ export default class BuildPayload {
 		this.cursorBroadcast.commitBroadcast.phase = payload.phase;
 		this.cursorBroadcast.commitBroadcast.status = payload.status;
 		this.cursorBroadcast.commitBroadcast.target = payload.target;
-		this.cursorBroadcast.activePhaseCallback = this.cursorBroadcast.phaseCallback.commit;
+		this.cursorBroadcast.activePhaseThrottleRef = this.cursorBroadcast.phaseThrottleRefs.commit;
+		this.cursorBroadcast.activePhaseCallback = this.cursorBroadcast.phaseCallbacks.commit;
 		this.cursorBroadcast.broadcastCommit();
 	}
 	// havent decided on cancel strategy yet. this probably aint it. 
 	buildCancelPayload(payload) {
-		// this.#cursorBroadcast.broadcastCancel.x = payload.x;
-		// this.#cursorBroadcast.broadcastCancel.y = payload.y;
-		// this.#cursorBroadcast.broadcastCancel.buttons = payload.buttons;
-		// this.#cursorBroadcast.broadcastCancel.phase = payload.phase;
-		// this.#cursorBroadcast.broadcastCancel.status = payload.status;
-		// this.#cursorBroadcast.broadcastCancel.target = payload.status;
-		// this.cursorBroadcast.activeStatusCallback = this.cursorBroadcast.phaseCallback.cancel;
+		// this.#cursorBroadcast.cancelBroadcast.x = payload.x;
+		// this.#cursorBroadcast.cancelBroadcast.y = payload.y;
+		// this.#cursorBroadcast.cancelBroadcast.buttons = payload.buttons;
+		// this.#cursorBroadcast.cancelBroadcast.phase = payload.phase;
+		// this.#cursorBroadcast.cancelBroadcast.status = payload.status;
+		// this.#cursorBroadcast.cancelBroadcast.target = payload.status;
+		// this.cursorBroadcast.activePhaseThrottleRef = this.cursorBroadcast.phaseThrottleRefs.cancel
+		// this.cursorBroadcast.activePhaseCallback = this.cursorBroadcast.phaseCallbacks.cancel;
+		// this.cursorBroadcast.broadcastCancel()
 	}
 }

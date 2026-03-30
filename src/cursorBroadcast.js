@@ -9,9 +9,9 @@ export default class CursorBroadcast {
 	static lastPhaseRenderTime = performance.now();
 	static statusDeltaTime = performance.now();
 	static phaseDeltaTime = performance.now();
-	static phaseCallback; // Callback refs to be used in phase throttling methods. Active callback is stored in activePhaseCallback
+	static phaseCallbacks; // Callback refs to be used in phase throttling methods. Active callback is stored in activePhaseCallback
 	static activePhaseCallback; // Active callback to be used in throttling methods. Phases are dynamic. Callback refs are held in phaseCallback {}
-	static activeStatusCallback; // Callback to be used in throttling methods. Status is static
+	static statusBroadcastCallback; // Callback to be used in throttling methods. Status is set statically below
 	static statusThrottle; // Configured throttle strategy method
 	static customStatusThrottleRate; // Calculated custom frame time from config object
 	static phaseThrottle; // Configured throttle strategy method
@@ -55,47 +55,56 @@ export default class CursorBroadcast {
 			target: null,
 			payloads: {},
 		};
-		this.activeStatusCallback = this.broadcastStatusCallback;
-		this.phaseCallback = {
+		this.phaseCallbacks = {
 			intent: this.intentPhaseCallback,
 			commit: this.commitPhaseCallback,
 			cancel: this.cancelPhaseCallback,
-		}; 
-		this.activePhaseCallback = null;
+		};
+		this.activePhaseCallback = null; // Set by config at init. Default "auto" (rAF)
+		this.phaseThrottleRefs = {
+			intent: null,
+			commit: null,
+			cancel: null,
+		};
+		this.activePhaseThrottleRef = null;
+		this.statusThrottleRef = null;
 	}
 	// Broadcast to subscribers
 	broadcastStatus() {
-		console.log(this.statusThrottle)
 		this.statusThrottle();
 	}
-	broadcastStatusCallback = (timestamp) => {
+	statusBroadcastCallback = (timestamp) => {
+		console.log("last render", this.lastPhaseRenderTime);
 		this.lastStatusRenderTime = timestamp;
 		this.statusDeltaTime = 0;
+		this.statusThrottleRef = null
 		this.broadcastRegistry.statusSubscribers.forEach((subscriber) => {
 			subscriber(this.statusBroadcast);
 			return;
 		});
 	};
 
-	broadcastIntent() {
-		console.log(this.phaseThrottle);
-		this.phaseThrottle();
+	broadcastIntent(timestamp) {
+		this.phaseThrottle(timestamp);
 	}
 	intentPhaseCallback = (timestamp) => {
+		console.log("last render", this.lastPhaseRenderTime);
 		this.lastPhaseRenderTime = timestamp;
 		this.phaseDeltaTime = 0;
+		this.activePhaseThrottleRef = null;
 		this.broadcastRegistry.intentSubscribers.forEach((subscriber) => {
 			subscriber(this.intentBroadcast);
 		});
 	};
 
 	broadcastCommit() {
-		console.log(this.phaseThrottle);
 		this.phaseThrottle();
 	}
 	commitPhaseCallback = (timestamp) => {
+		console.log("last render", this.lastPhaseRenderTime);
 		this.lastPhaseRenderTime = timestamp;
 		this.phaseDeltaTime = 0;
+		this.activePhaseThrottleRef = null;
 		this.broadcastRegistry.commitSubscribers.forEach((subscriber) => {
 			subscriber(this.commitBroadcast);
 		});
@@ -105,8 +114,10 @@ export default class CursorBroadcast {
 		this.phaseThrottle();
 	}
 	cancelPhaseCallback = (timestamp) => {
+		console.log("last render", this.lastPhaseRenderTime);
 		this.lastPhaseRenderTime = timestamp;
 		this.phaseDeltaTime = 0;
+		this.activePhaseCallback = null;
 		this.broadcastRegistry.cancelSubscribers.forEach((subscriber) => {
 			subscriber(this.cancelBroadcast);
 		});
@@ -146,17 +157,19 @@ export default class CursorBroadcast {
 
 	// Rate limit control
 	rAFThrottleStatus() {
-		this.getStatusDeltaTime();
-		return window.requestAnimationFrame(this.activeStatusCallback);
+		if (!this.statusThrottleRef) {
+			this.statusThrottleRef = window.requestAnimationFrame(this.statusBroadcastCallback);
+			return
+		}
 	}
 	customThrottleStatus() {
 		this.getStatusDeltaTime();
 		if (this.statusDeltaTime >= this.customStatusThrottleRate) {
 			return this.broadcastStatusCallback(performance.now());
-		}
+		};
 	}
 	bypassThrottleStatus() {
-		return this.broadcastStatusCallback(performance.now());
+		return this.statusBroadcastCallback(performance.now);
 	}
 	getStatusDeltaTime() {
 		this.statusDeltaTime = performance.now() - this.lastStatusRenderTime;
@@ -164,8 +177,10 @@ export default class CursorBroadcast {
 	}
 
 	rAFThrottlePhases() {
-		this.getPhaseDeltaTime();
-		return window.requestAnimationFrame(this.activePhaseCallback);
+		if (!this.activePhaseThrottleRef) {
+			this.activePhaseThrottleRef = window.requestAnimationFrame(this.activePhaseCallback);
+			return;
+		}
 	}
 	customThrottlePhases() {
 		this.getPhaseDeltaTime();

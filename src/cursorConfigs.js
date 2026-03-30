@@ -41,14 +41,15 @@ export default class CursorConfigs {
 	setPhasesThrottle() {
 		if (this.throttlePhases === "auto") {
 			this.#CursorBroadcast.phaseThrottle =
-				this.#CursorBroadcast.rAFThrottlePhases;
+                this.#CursorBroadcast.rAFThrottlePhases;
+                this.#CursorBroadcast.
 			return;
 		} else if (this.throttlePhases === 0) {
 			this.#CursorBroadcast.phaseThrottle =
 				this.#CursorBroadcast.bypassThrottlePhases;
 			return;
 		} else if (this.throttlePhases >= 1) {
-			this.#CursorBroadcast.phasesThrottle =
+			this.#CursorBroadcast.phaseThrottle =
 				this.#CursorBroadcast.customThrottlePhases;
 			this.#CursorBroadcast.customPhaseThrottleRate =
 				1000 / this.throttlePhases;
