@@ -59,22 +59,22 @@ export default class CursorInspector {
 	}
 
 	get lastEventTime() {
-		return this.lastEventTime;
+		return this.#cursorBroadcast.lastEventTime;
 	}
 	get idleTimer() {
-		return this.idleTimer;
+		return this.#cursorBroadcast.idleTimer;
 	}
 	get lastStatusRenderTime() {
-		return this.lastStatusRenderTime;
+		return this.#cursorBroadcast.lastStatusRenderTime;
 	}
 	get lastPhaseRenderTime() {
-		return this.lastPhaseRenderTime;
+		return this.#cursorBroadcast.lastPhaseRenderTime;
 	}
 	get statusDeltaTime() {
-		return this.statusDeltaTime;
+		return this.#cursorBroadcast.statusDeltaTime;
 	}
 	get phaseDeltaTime() {
-		return this.phaseDeltaTime;
+		return this.#cursorBroadcast.phaseDeltaTime;
 	}
 
 

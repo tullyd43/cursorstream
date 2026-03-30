@@ -31,7 +31,7 @@ export default class PayloadRegistry {
 	// Remove payloads from payloadRegistry and cusrorBroadcast objects
 	removeStatusPayload(providerID) {
 		this.statusPayloads.delete(providerID);
-		this.cursorBroadcast.statusbBroadcast.payloads.delete(providerID);
+		this.cursorBroadcast.statusBroadcast.payloads.delete(providerID);
 	}
 	removeIntentPayload(providerID) {
 		this.intentPayloads.delete(providerID);

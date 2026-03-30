@@ -62,7 +62,7 @@ export default class CursorStream {
 				this.forwardPayload();
 				this.phase = null;
 				this.buttons = 0;
-				thi.nullCommitInjection();
+				this.nullCommitInjection();
 				break;
 			// Cancel might need another path for a dedicated cancel button
 			case "pointercancel":
