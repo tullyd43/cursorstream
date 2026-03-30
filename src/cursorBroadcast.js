@@ -9,9 +9,6 @@ export default class CursorBroadcast {
 	static lastPhaseRenderTime = performance.now();
 	static statusDeltaTime = performance.now();
 	static phaseDeltaTime = performance.now();
-	static phaseCallbacks; // Callback refs to be used in phase throttling methods. Active callback is stored in activePhaseCallback
-	static activePhaseCallback; // Active callback to be used in throttling methods. Phases are dynamic. Callback refs are held in phaseCallback {}
-	static statusBroadcastCallback; // Callback to be used in throttling methods. Status is set statically below
 	static statusThrottle; // Configured throttle strategy method
 	static customStatusThrottleRate; // Calculated custom frame time from config object
 	static phaseThrottle; // Configured throttle strategy method
@@ -59,22 +56,22 @@ export default class CursorBroadcast {
 			intent: this.intentPhaseCallback,
 			commit: this.commitPhaseCallback,
 			cancel: this.cancelPhaseCallback,
-		};
-		this.activePhaseCallback = null; // Set by config at init. Default "auto" (rAF)
+		}; // Callback refs to be used in phase throttling methods. Active callback is stored in activePhaseCallback
 		this.phaseThrottleRefs = {
 			intent: null,
 			commit: null,
 			cancel: null,
-		};
-		this.activePhaseThrottleRef = null;
-		this.statusThrottleRef = null;
+		}; // Actual callback reference storage for throttling methods.
+		this.activePhaseCallback = null; // Set by config at init. Default "auto" (rAF). Active callback to be used in throttling methods. Phases are dynamic. Callback refs are held in phaseCallback {}
+		this.activePhaseThrottleRef = null; // Active callback reference key for throttling methods. Dynamically set on phase transition. See buildPayload.
+		this.statusThrottleRef = null; // Callback reference for throttling methods
+		this.statusBroadcastCallback = this.statusBroadcastCallback; // Callback to be used in throttling methods. Status is set statically below
 	}
 	// Broadcast to subscribers
 	broadcastStatus() {
 		this.statusThrottle();
 	}
 	statusBroadcastCallback = (timestamp) => {
-		console.log("last render", this.lastPhaseRenderTime);
 		this.lastStatusRenderTime = timestamp;
 		this.statusDeltaTime = 0;
 		this.statusThrottleRef = null
@@ -83,12 +80,10 @@ export default class CursorBroadcast {
 			return;
 		});
 	};
-
 	broadcastIntent(timestamp) {
 		this.phaseThrottle(timestamp);
 	}
 	intentPhaseCallback = (timestamp) => {
-		console.log("last render", this.lastPhaseRenderTime);
 		this.lastPhaseRenderTime = timestamp;
 		this.phaseDeltaTime = 0;
 		this.activePhaseThrottleRef = null;
@@ -96,12 +91,10 @@ export default class CursorBroadcast {
 			subscriber(this.intentBroadcast);
 		});
 	};
-
 	broadcastCommit() {
 		this.phaseThrottle();
 	}
 	commitPhaseCallback = (timestamp) => {
-		console.log("last render", this.lastPhaseRenderTime);
 		this.lastPhaseRenderTime = timestamp;
 		this.phaseDeltaTime = 0;
 		this.activePhaseThrottleRef = null;
@@ -109,12 +102,10 @@ export default class CursorBroadcast {
 			subscriber(this.commitBroadcast);
 		});
 	};
-
 	broadcastCancel() {
 		this.phaseThrottle();
 	}
 	cancelPhaseCallback = (timestamp) => {
-		console.log("last render", this.lastPhaseRenderTime);
 		this.lastPhaseRenderTime = timestamp;
 		this.phaseDeltaTime = 0;
 		this.activePhaseCallback = null;

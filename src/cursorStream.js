@@ -7,6 +7,18 @@ export default class CursorStream {
 	idleDelay;
 	StreamSources = new StreamSources(this);
 	payloadRouter = new PayloadRouter();
+	extraFields = {
+		status: [],
+		intent: [],
+		commit: [],
+		cancel: [],
+	};
+	nullFields = {
+		status: [],
+		intent: [],
+		commit: [],
+		cancel: [],
+	};
 	constructor() {
 		this.x;
 		this.y;
@@ -15,19 +27,24 @@ export default class CursorStream {
 		this.status;
 		this.target;
 	}
+
 	start() {
 		this.StreamSources.moveListener();
 		this.StreamSources.downListener();
 		this.StreamSources.upListener();
 		this.StreamSources.cancelListener();
 		this.idleTimer = null;
+		this.injectExtraFields();
 		return;
 	}
 	stop() {
 		window.removeEventListener("pointermove", this.StreamSources.onMove);
 		window.removeEventListener("pointerdown", this.StreamSources.onDown);
 		window.removeEventListener("pointerup", this.StreamSources.onUp);
-		window.removeEventListener("pointercancel", this.StreamSources.onCancel);
+		window.removeEventListener(
+			"pointercancel",
+			this.StreamSources.onCancel,
+		);
 		return;
 	}
 	streamPhase(e) {
@@ -35,7 +52,9 @@ export default class CursorStream {
 			case "pointerdown":
 				this.phase = "intent";
 				this.buttons = e.buttons;
+				this.runIntentInjection();
 				this.forwardPayload();
+				this.nullIntentInjection();
 				break;
 			case "pointerup":
 				this.phase = "commit";
@@ -43,14 +62,16 @@ export default class CursorStream {
 				this.forwardPayload();
 				this.phase = null;
 				this.buttons = 0;
+				thi.nullCommitInjection();
 				break;
 			// Cancel might need another path for a dedicated cancel button
 			case "pointercancel":
 				this.phase = "cancel";
-				this.buttons = e.buttons
+				this.buttons = e.buttons;
 				this.forwardPayload();
 				this.phase = null;
 				this.buttons = 0;
+				this.nullCancelInjection();
 				break;
 		}
 		return;
@@ -68,6 +89,7 @@ export default class CursorStream {
 		this.y = e.clientY;
 		this.target = e.target;
 		this.lastEventTime = e.timeStamp;
+		this.runStatusInjection();
 		this.streamStatus();
 		return;
 	}
@@ -96,5 +118,42 @@ export default class CursorStream {
 	stopIdleTimer() {
 		clearTimeout(this.idleTimer);
 		this.idleTimer = null;
+	}
+
+	runStatusInjection(e) {
+		for (let i = 0; i < this.extraFields.status.length; i++) {
+			this[this.extraFields.status[i]] = e[this.extraFields.status[i]];
+		}
+	}
+	runIntentInjection(e) {
+		for (let i = 0; i < this.extraFields.intent.length; i++) {
+			this[this.extraFields.intent[i]] = e[this.extraFields.intent[i]];
+		}
+	}
+	runCommitInjection(e) {
+		for (let i = 0; i < this.extraFields.commit.length; i++) {
+			this[this.extraFields.commit[i]] = e[this.extraFields.commit[i]];
+		}
+	}
+	runCancelInjection(e) {
+		for (let i = 0; i < this.extraFields.cancel.length; i++) {
+			this[this.extraFields.cancel[i]] = e[this.extraFields.cancel[i]];
+		}
+	}
+
+	nullIntentInjection() {
+		for (let i = 0; i < this.nullFields.intent.length; i++) {
+			this[this.nullFields.intent[i]] = null;
+		}
+	}
+	nullCommitInjection() {
+		for (let i = 0; i < this.nullFields.commit.length; i++) {
+			this[this.nullFields.commit[i]] = null;
+		}
+	}
+	nullCancelInjection() {
+		for (let i = 0; i < this.nullFields.cancel.length; i++) {
+			this[this.nullFields.cancel[i]] = null;
+		}
 	}
 }

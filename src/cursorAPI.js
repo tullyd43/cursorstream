@@ -1,6 +1,7 @@
 import CursorConfigs from "./cursorConfigs.js";
 import CursorInspector from "./cursorInspector.js";
 import CursorStream from "./cursorStream.js";
+import FieldInjector from "./fieldInjector.js";
 import StreamSources from "./streamSources.js";
 
 export default class CursorAPI {
@@ -29,7 +30,6 @@ export default class CursorAPI {
 	streamStop() {
 		this.#CursorStream.stop();
 	}
-	setIdleInterval() {}
 
 	subscribeStatus(callback) {
 		this.#BroadcastRegistry.subscribeStatus(callback);
