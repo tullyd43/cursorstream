@@ -9,6 +9,7 @@ export default class PayloadRouter {
 		phase: null,
 		status: null,
 		target: null,
+		
 	};
 	constructor() {
 		this.payloadBuffer = {};

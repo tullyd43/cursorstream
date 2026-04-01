@@ -6,7 +6,7 @@ export default class CursorStream {
 	static idleTimer;
 	idleDelay;
 	StreamSources = new StreamSources(this);
-	payloadRouter = new PayloadRouter();
+	payloadRouter = new PayloadRouter(this);
 	extraFields = {
 		status: [],
 		intent: [],
@@ -14,10 +14,20 @@ export default class CursorStream {
 		cancel: [],
 	};
 	nullFields = {
-		status: [],
 		intent: [],
 		commit: [],
 		cancel: [],
+	};
+	injectionBypass = {
+		status: null,
+		intent: null,
+		commit: null,
+		cancel: null,
+	};
+	nullInjectionBypass = {
+		intent: null,
+		commit: null,
+		cancel: null,
 	};
 	constructor() {
 		this.x;
@@ -34,7 +44,6 @@ export default class CursorStream {
 		this.StreamSources.upListener();
 		this.StreamSources.cancelListener();
 		this.idleTimer = null;
-		this.injectExtraFields();
 		return;
 	}
 	stop() {
@@ -52,26 +61,28 @@ export default class CursorStream {
 			case "pointerdown":
 				this.phase = "intent";
 				this.buttons = e.buttons;
-				this.runIntentInjection();
+				this.injectionBypass.intent();
 				this.forwardPayload();
-				this.nullIntentInjection();
+				this.nullInjectionBypass.intent();
 				break;
 			case "pointerup":
 				this.phase = "commit";
 				this.buttons = e.buttons;
+				this.injectionBypass.commit();
 				this.forwardPayload();
 				this.phase = null;
 				this.buttons = 0;
-				this.nullCommitInjection();
+				this.nullInjectionBypass.commit();
 				break;
 			// Cancel might need another path for a dedicated cancel button
 			case "pointercancel":
 				this.phase = "cancel";
 				this.buttons = e.buttons;
+				this.injectionBypass.cancel();
 				this.forwardPayload();
 				this.phase = null;
 				this.buttons = 0;
-				this.nullCancelInjection();
+				this.nullInjectionBypass.cancel();
 				break;
 		}
 		return;
@@ -89,7 +100,7 @@ export default class CursorStream {
 		this.y = e.clientY;
 		this.target = e.target;
 		this.lastEventTime = e.timeStamp;
-		this.runStatusInjection();
+		this.injectionBypass.status();
 		this.streamStatus();
 		return;
 	}
@@ -119,7 +130,8 @@ export default class CursorStream {
 		clearTimeout(this.idleTimer);
 		this.idleTimer = null;
 	}
-
+	// iterate over array of declared extra fields populated by configs at at init time set by the user at instantiation.
+	// defaults to bypassing injection. defailt sets reference to null to skip injection loop.
 	runStatusInjection(e) {
 		for (let i = 0; i < this.extraFields.status.length; i++) {
 			this[this.extraFields.status[i]] = e[this.extraFields.status[i]];
@@ -140,7 +152,8 @@ export default class CursorStream {
 			this[this.extraFields.cancel[i]] = e[this.extraFields.cancel[i]];
 		}
 	}
-
+	// resets per phase injected fields to null on phase events. Runs after forwarding payloads to keep state in sync for phases.
+	// status runs and mutates every frame. It's always fresh, no need to null.
 	nullIntentInjection() {
 		for (let i = 0; i < this.nullFields.intent.length; i++) {
 			this[this.nullFields.intent[i]] = null;

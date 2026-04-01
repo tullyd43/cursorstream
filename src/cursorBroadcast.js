@@ -65,7 +65,6 @@ export default class CursorBroadcast {
 		this.activePhaseCallback = null; // Set by config at init. Default "auto" (rAF). Active callback to be used in throttling methods. Phases are dynamic. Callback refs are held in phaseCallback {}
 		this.activePhaseThrottleRef = null; // Active callback reference key for throttling methods. Dynamically set on phase transition. See buildPayload.
 		this.statusThrottleRef = null; // Callback reference for throttling methods
-		this.statusBroadcastCallback = this.statusBroadcastCallback; // Callback to be used in throttling methods. Status is set statically below
 	}
 	// Broadcast to subscribers
 	broadcastStatus() {
