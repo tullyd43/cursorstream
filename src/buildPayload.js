@@ -50,4 +50,8 @@ export default class BuildPayload {
 		// this.cursorBroadcast.activePhaseCallback = this.cursorBroadcast.phaseCallbacks.cancel;
 		// this.cursorBroadcast.broadcastCancel()
 	}
+
+	mergeInjections() {
+
+	}
 }

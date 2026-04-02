@@ -111,6 +111,7 @@ export default class CursorStream {
 		this.payloadRouter.payloadBuffer.phase = this.phase;
 		this.payloadRouter.payloadBuffer.status = this.status;
 		this.payloadRouter.payloadBuffer.target = this.target;
+		this.payloadRouter.forwardInjections.bind(this);
 		console.log("live mutable", this);
 		this.payloadRouter.route();
 	}

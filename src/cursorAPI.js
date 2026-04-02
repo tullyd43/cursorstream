@@ -14,7 +14,7 @@ export default class CursorAPI {
 		this.#CursorBroadcast = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast;
 		this.#BroadcastRegistry = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast.broadcastRegistry;
 		this.#PayloadRegistry = this.#CursorStream.payloadRouter.buildPayload.cursorBroadcast.payloadRegistry;
-		this.#CursorConfigs = new CursorConfigs(this.#CursorStream, this.#CursorBroadcast, configs);
+		this.#CursorConfigs = new CursorConfigs(this.#CursorStream, this.#CursorBroadcast, this.#CursorStream.payloadRouter, configs);
 		this.Inspector = new CursorInspector({
 			broadcastRegistry: this.#BroadcastRegistry,
 			payloadRegistry: this.#PayloadRegistry,
